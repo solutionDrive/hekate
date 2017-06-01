@@ -4,17 +4,22 @@
     "type": "cli",
     "homepage": "https://www.solutiondrive.de",
     "require": {
-        "symfony/console": "^3.3"
+      "symfony/console": "^3.3"
     },
     "require-dev": {
-        "phpunit/phpunit": "^6.1"
+      "phpunit/phpunit": "^6.1"
+    },
+    "autoload": {
+      "psr-4": {
+        "sd\\hekate\\": "src/"
+      }
     },
     "license": "MIT",
     "authors": [
-        {
-            "name": "Matthias Alt",
-            "email": "alt@solutiondrive.de"
-        }
+      {
+        "name": "Matthias Alt",
+        "email": "alt@solutiondrive.de"
+      }
     ],
     "minimum-stability": "stable"
 }
