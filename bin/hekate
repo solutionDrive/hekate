@@ -10,13 +10,13 @@ use Symfony\Component\Console\Application;
 $application = new Application();
 
 /**
- * 1. bit
+ * 1. bitbucket:repo-list
  */
 $bitBucketListCommand = new BitBucketRepoListCommand();
 $bitBucketAuthentication = new BitbucketAuthentication();
-
 $bitBucketListCommand->setAuthentication($bitBucketAuthentication);
 
 $application->add(new BitBucketRepoListCommand());
+
 
 $application->run();
