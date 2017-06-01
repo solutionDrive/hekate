@@ -4,7 +4,8 @@
     "type": "cli",
     "homepage": "https://www.solutiondrive.de",
     "require": {
-      "symfony/console": "^3.3"
+      "symfony/console": "^3.3",
+      "gentle/bitbucket-api": "^0.8"
     },
     "require-dev": {
       "phpunit/phpunit": "^6.1"
