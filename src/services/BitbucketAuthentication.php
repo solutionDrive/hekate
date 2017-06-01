@@ -39,4 +39,5 @@ class BitbucketAuthentication implements BasicAuthenticationInterface
     {
         $this->password = $password;
     }
+
 }
