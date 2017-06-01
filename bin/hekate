@@ -3,10 +3,20 @@
 
 require __DIR__.'/../vendor/autoload.php';
 
+use sd\hekate\commands\BitBucketRepoListCommand;
+use sd\hekate\services\BitbucketAuthentication;
 use Symfony\Component\Console\Application;
 
 $application = new Application();
 
-$application->add(new \sd\hekate\commands\BitBucketRepoListCommand());
+/**
+ * 1. bit
+ */
+$bitBucketListCommand = new BitBucketRepoListCommand();
+$bitBucketAuthentication = new BitbucketAuthentication();
+
+$bitBucketListCommand->setAuthentication($bitBucketAuthentication);
+
+$application->add(new BitBucketRepoListCommand());
 
 $application->run();

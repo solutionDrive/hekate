@@ -10,13 +10,21 @@
 
 namespace sd\hekate\commands;
 
-
+use sd\hekate\interfaces\AuthenticationInterface;
+use sd\hekate\services\BitbucketAuthentication;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class BitBucketRepoListCommand extends Command
 {
+    /** @var  BitbucketAuthentication */
+    protected $authentication;
+
+    public function setAuthentication(AuthenticationInterface $authentication)
+    {
+        $this->authentication = $authentication;
+    }
     /**
      * Basic Setup
      */
@@ -37,6 +45,6 @@ class BitBucketRepoListCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        return parent::execute($input, $output);
+        print get_class($this->authentication);
     }
 }
