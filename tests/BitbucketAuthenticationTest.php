@@ -13,5 +13,17 @@ use PHPUnit\Framework\TestCase;
 
 class BitbucketAuthenticationTest extends TestCase
 {
+    /** @var  BitbucketAuthentication */
+    protected $testSubject;
 
+    protected function setUp()
+    {
+        $this->testSubject = new BitbucketAuthentication();
+    }
+
+    public function testSetUserName()
+    {
+        $this->testSubject->setUserName('my_user_name');
+        self::assertAttributeEquals('my_user_name', 'username', $this->testSubject);
+    }
 }
