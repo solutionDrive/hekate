@@ -10,10 +10,22 @@
 
 namespace sd\hekate\services;
 
+use sd\hekate\interfaces\BasicAuthenticationInterface;
 
-use sd\hekate\interfaces\AuthenticationInterface;
-
-class BitbucketAuthentication implements AuthenticationInterface
+/**
+ * Class BitbucketAuthenticationInterface
+ * @package sd\hekate\services
+ */
+class BitbucketAuthentication implements BasicAuthenticationInterface
 {
+    /** @var  string */
+    protected $username;
 
+    /**
+     * @param string $username
+     */
+    public function setUserName($username)
+    {
+        $this->username = $username;
+    }
 }
