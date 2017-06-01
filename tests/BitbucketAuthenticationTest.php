@@ -26,4 +26,10 @@ class BitbucketAuthenticationTest extends TestCase
         $this->testSubject->setUserName('my_user_name');
         self::assertAttributeEquals('my_user_name', 'username', $this->testSubject);
     }
+
+    public function testSetPassword()
+    {
+        $this->testSubject->setPassword('my_secret_password');
+        self::assertAttributeEquals('my_secret_password', 'password', $this->testSubject);
+    }
 }

@@ -21,11 +21,22 @@ class BitbucketAuthentication implements BasicAuthenticationInterface
     /** @var  string */
     protected $username;
 
+    /** @var  string */
+    protected $password;
+
     /**
      * @param string $username
      */
     public function setUserName($username)
     {
         $this->username = $username;
+    }
+
+    /**
+     * @param string $password
+     */
+    public function setPassword($password)
+    {
+        $this->password = $password;
     }
 }
