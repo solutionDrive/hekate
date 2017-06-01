@@ -7,4 +7,6 @@ use Symfony\Component\Console\Application;
 
 $application = new Application();
 
+$application->add(new \sd\hekate\commands\BitBucketRepoListCommand());
+
 $application->run();
