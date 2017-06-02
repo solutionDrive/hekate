@@ -20,9 +20,6 @@ use Bitbucket\API\Repositories;
  */
 class BitbucketRepositoryList
 {
-
-
-
     /** @var  string */
     protected $password;
 
@@ -31,6 +28,9 @@ class BitbucketRepositoryList
 
     /** @var  Pager */
     protected $pager;
+
+    /** @var  array */
+    protected $_filteredRepositoryList;
 
     /**
      * BitbucketRepositoryList constructor.
@@ -64,16 +64,16 @@ class BitbucketRepositoryList
      */
     public function getAll()
     {
-        $allRepositories = [];
+        $this->_filteredRepositoryList = [];
         do {
             $responseForPage = $this->pager->getCurrent();
             $reposOfPage = json_decode($responseForPage->getContent());
             foreach ($reposOfPage->values as $repository) {
-                $allRepositories = $this->_addRepositoryInformation($repository, $allRepositories);
+                $this->_filteredRepositoryList = $this->_addRepositoryInformation($repository);
             }
             $this->pager->fetchNext();
         } while ($this->pager->hasNext());
-        return $allRepositories;
+        return $this->_filteredRepositoryList;
     }
 
     /**
@@ -93,19 +93,18 @@ class BitbucketRepositoryList
 
     /**
      * @param $repository
-     * @param $allRepositories
      * @return mixed
      */
-    protected function _addRepositoryInformation($repository, $allRepositories)
+    protected function _addRepositoryInformation($repository)
     {
-        $allRepositories[$repository->name]['name'] = $repository->name;
+        $this->_filteredRepositoryList[$repository->name]['name'] = $repository->name;
         if ($this->_repositoryHasProjectInformation($repository)) {
-            $allRepositories = $this->_addProjectInformationOfRepository($repository, $allRepositories);
+            $this->_filteredRepositoryList = $this->_addProjectInformationOfRepository($repository);
         }
         if ($this->_repositoryHasSlug($repository)) {
-            $allRepositories = $this->_addSlugInformationOfRepository($repository, $allRepositories);
+            $this->_filteredRepositoryList = $this->_addSlugInformationOfRepository($repository);
         }
-        return $allRepositories;
+        return $this->_filteredRepositoryList;
     }
 
     /**
@@ -119,13 +118,12 @@ class BitbucketRepositoryList
 
     /**
      * @param $repository
-     * @param $allRepositories
      * @return mixed
      */
-    protected function _addProjectInformationOfRepository($repository, $allRepositories)
+    protected function _addProjectInformationOfRepository($repository)
     {
-        $allRepositories[$repository->name]['project'] = $repository->project->name;
-        return $allRepositories;
+        $this->_filteredRepositoryList[$repository->name]['project'] = $repository->project->name;
+        return $this->_filteredRepositoryList;
     }
 
     /**
@@ -139,12 +137,11 @@ class BitbucketRepositoryList
 
     /**
      * @param $repository
-     * @param $allRepositories
      * @return mixed
      */
-    protected function _addSlugInformationOfRepository($repository, $allRepositories)
+    protected function _addSlugInformationOfRepository($repository)
     {
-        $allRepositories[$repository->name]['slug'] = $repository->slug;
-        return $allRepositories;
+        $this->_filteredRepositoryList[$repository->name]['slug'] = $repository->slug;
+        return $this->_filteredRepositoryList;
     }
 }
