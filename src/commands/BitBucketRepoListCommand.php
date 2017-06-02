@@ -15,10 +15,13 @@ use Bitbucket\API\Repositories;
 use Buzz\Message\Response;
 use sd\hekate\lib\BitbucketRepositoryList;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Helper\Helper;
+use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Question\Question;
 
 class BitBucketRepoListCommand extends Command
 {
@@ -49,10 +52,28 @@ class BitBucketRepoListCommand extends Command
         $password = $input->getOption('password');
         $account = $input->getOption('account');
 
+        /** @var QuestionHelper $helper */
+        $helper = $this->getHelper('question');
+
+        if (empty($username)) {
+            $question = new Question('Please enter your username: ');
+            $username = $helper->ask($input, $output, $question);
+        }
+
+        if (empty($password)) {
+            $question = new Question('Please enter your password: ');
+            $question->setHidden(true);
+            $question->setHiddenFallback(false);
+            $password = $helper->ask($input, $output, $question);
+        }
+
+        if (empty($account)) {
+            $question = new Question('Please enter the name of your Bitbucket Account: ');
+            $account = $helper->ask($input, $output, $question);
+        }
+
         $repositoryList = new BitbucketRepositoryList(new Repositories());
         $repositoryList->setCredentials($username, $password);
-
-        /** @var Pager $pager */
         $repositoryList->createPager($account);
 
         $repoInfo = $repositoryList->getAll();
