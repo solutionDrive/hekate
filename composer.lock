@@ -4,32 +4,34 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "9059382b3f240add5851115a473536e3",
+    "content-hash": "5bf2d7ecd288e70c202387c2e3834bf3",
     "packages": [
         {
             "name": "gentle/bitbucket-api",
-            "version": "0.8.4",
+            "version": "dev-develop",
             "source": {
                 "type": "git",
                 "url": "https://github.com/gentlero/bitbucket-api.git",
-                "reference": "ddce875362551472d17e484beb7d04e3118c42bc"
+                "reference": "84e98bca48e4c07501ccaf6c1be1fe84dd173cb6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/gentlero/bitbucket-api/zipball/ddce875362551472d17e484beb7d04e3118c42bc",
-                "reference": "ddce875362551472d17e484beb7d04e3118c42bc",
+                "url": "https://api.github.com/repos/gentlero/bitbucket-api/zipball/84e98bca48e4c07501ccaf6c1be1fe84dd173cb6",
+                "reference": "84e98bca48e4c07501ccaf6c1be1fe84dd173cb6",
                 "shasum": ""
             },
             "require": {
-                "jacobkiers/oauth": "~1.0.10",
-                "kriswallsmith/buzz": "~0.13",
-                "php": ">=5.3"
+                "jacobkiers/oauth": "~1.0",
+                "kriswallsmith/buzz": "~0.15",
+                "php": ">=5.4.0"
             },
             "conflict": {
-                "eabay/bitbucket-repo-sync": "*"
+                "eabay/bitbucket-repo-sync": "*",
+                "rlacerda83/bitbucket-api": "*"
             },
             "require-dev": {
-                "phpunit/phpunit": "3.7.*"
+                "phpunit/phpunit": "3.7.*",
+                "squizlabs/php_codesniffer": "~2.7"
             },
             "suggest": {
                 "ext-curl": "*"
@@ -55,13 +57,13 @@
                     "role": "Developer"
                 }
             ],
-            "description": "Bitbucket API wrapper for PHP >= 5.3",
+            "description": "Bitbucket API wrapper for PHP >= 5.4",
             "homepage": "https://bitbucket.org/gentlero/bitbucket-api",
             "keywords": [
                 "api",
                 "bitbucket"
             ],
-            "time": "2017-05-15T10:51:43+00:00"
+            "time": "2017-05-15 10:54:46"
         },
         {
             "name": "jacobkiers/oauth",
@@ -1854,7 +1856,9 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "gentle/bitbucket-api": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": [],
