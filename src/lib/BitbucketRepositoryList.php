@@ -29,6 +29,9 @@ class BitbucketRepositoryList
     /** @var  string */
     protected $username;
 
+    /** @var  Pager */
+    protected $pager;
+
     /**
      * BitbucketRepositoryList constructor.
      */
@@ -46,14 +49,26 @@ class BitbucketRepositoryList
         $this->repositories->setCredentials(new Basic($username, $password));
     }
 
-    public function getAll($accountname = '')
+    public function getAll()
     {
-        return $this->repositories->all($accountname);
+        $allRepositories = [];
+        do {
+            $responseForPage = $this->pager->getCurrent();
+            $reposOfPage = json_decode($responseForPage->getContent());
+            foreach ($reposOfPage->values as $repo) {
+                $allRepositories[$repo->name]['name'] = $repo->name;
+            }
+            $this->pager->fetchNext();
+        } while ($this->pager->hasNext());
+        return $allRepositories;
     }
 
-    public function getPager($account)
+    /**
+     * Creates a Pager Object for all Repositories of the given account
+     * @param string $account
+     */
+    public function createPager($account)
     {
-        $pager = new Pager($this->repositories->getClient(), $this->repositories->all($account));
-        return $pager;
+        $this->pager = new Pager($this->repositories->getClient(), $this->repositories->all($account));
     }
 }

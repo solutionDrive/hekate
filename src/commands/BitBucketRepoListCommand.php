@@ -53,17 +53,10 @@ class BitBucketRepoListCommand extends Command
         $repositoryList->setCredentials($username, $password);
 
         /** @var Pager $pager */
-        $pager = $repositoryList->getPager($account);
-        $repoInfo = [];
+        $repositoryList->createPager($account);
 
-        do {
-            $responseForPage = $pager->getCurrent();
-            $reposOfPage = json_decode($responseForPage->getContent());
-            foreach ($reposOfPage->values as $repo) {
-                $repoInfo[$repo->name]['name'] = $repo->name;
-            }
-            $pager->fetchNext();
-        } while ($pager->hasNext());
+        $repoInfo = $repositoryList->getAll();
+
 
         $table = new Table($output);
         $table->setHeaders(['name']);
