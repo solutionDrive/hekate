@@ -16,19 +16,33 @@ class BitbucketRepositoryListTest extends TestCase
     /** @var  BitbucketRepositoryList */
     protected $testSubject;
     /** @var  \Bitbucket\API\Repositories */
-    protected $repositoriesProphte;
+    protected $repositoriesProphet;
 
     protected function setUp()
     {
         $bitbucketApiRepositoriesProphet = $this->prophesize(\Bitbucket\API\Repositories::class);
 
-        $this->repositoriesProphte = $bitbucketApiRepositoriesProphet;
-        $this->testSubject = new BitbucketRepositoryList($this->repositoriesProphte->reveal());
+        $this->repositoriesProphet = $bitbucketApiRepositoriesProphet;
+        $this->testSubject = new BitbucketRepositoryList($this->repositoriesProphet->reveal());
     }
 
     public function testSetCredentials()
     {
         $this->testSubject->setCredentials('my_user_name', 'my_password');
-        $this->repositoriesProphte->setCredentials(\Prophecy\Argument::any())->shouldBeCalled();
+        $this->repositoriesProphet->setCredentials(\Prophecy\Argument::any())->shouldBeCalled();
+    }
+
+    public function testCreatePager()
+    {
+        $account = 'some_bitbucket_account';
+        $responseProphet = $this->prophesize(\Buzz\Message\Response::class);
+        $responseProphet->isOk()->willReturn(true);
+        $response = $responseProphet->reveal();
+        $this->repositoriesProphet
+            ->all($account)
+            ->shouldBeCalled()
+            ->willReturn($response);
+        $this->repositoriesProphet->getClient()->shouldBeCalled()->willReturn($this->prophesize(\Bitbucket\API\Http\Client::class)->reveal());
+        $this->testSubject->createPager($account);
     }
 }

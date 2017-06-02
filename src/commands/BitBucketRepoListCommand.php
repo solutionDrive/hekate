@@ -37,6 +37,7 @@ class BitBucketRepoListCommand extends Command
             ->addOption('username', 'u', InputArgument::OPTIONAL, 'The username of the bitbucket-User')
             ->addOption('password', 'p', InputArgument::OPTIONAL, 'The password of the bitbucket-User')
             ->addOption('account', 'a', InputArgument::OPTIONAL, 'account from which private repositories will be fetched')
+            ->addOption('projectkey', 'k', InputArgument::OPTIONAL, 'Filter the repositories by project key')
         ;
 
     }
@@ -51,6 +52,7 @@ class BitBucketRepoListCommand extends Command
         $username = $input->getOption('username');
         $password = $input->getOption('password');
         $account = $input->getOption('account');
+        $projectKey = $input->getOption('projectkey');
 
         /** @var QuestionHelper $helper */
         $helper = $this->getHelper('question');
@@ -76,11 +78,16 @@ class BitBucketRepoListCommand extends Command
         $repositoryList->setCredentials($username, $password);
         $repositoryList->createPager($account);
 
-        $repoInfo = $repositoryList->getAll();
+        if (empty($projectKey) === false) {
+            $repoInfo = $repositoryList->getAllForProjectKey($projectKey);
+        } else {
+
+            $repoInfo = $repositoryList->getAll();
+        }
 
 
         $table = new Table($output);
-        $table->setHeaders(['name']);
+        $table->setHeaders(['name', 'project', 'slug']);
         $table->setRows($repoInfo);
         $table->render();
     }
