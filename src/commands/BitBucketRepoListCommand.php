@@ -74,21 +74,43 @@ class BitBucketRepoListCommand extends Command
             $account = $helper->ask($input, $output, $question);
         }
 
-        $repositoryList = new BitbucketRepositoryList(new Repositories());
-        $repositoryList->setCredentials($username, $password);
-        $repositoryList->createPager($account);
+        $repositoryList = $this->_createRepositoryList($username, $password, $account);
 
-        if (empty($projectKey) === false) {
-            $repoInfo = $repositoryList->getAllForProjectKey($projectKey);
-        } else {
-
-            $repoInfo = $repositoryList->getAll();
-        }
+        $repoInfo = $this->_getInformationOfRepositories($projectKey, $repositoryList);
 
 
         $table = new Table($output);
         $table->setHeaders(['name', 'project', 'slug']);
         $table->setRows($repoInfo);
         $table->render();
+    }
+
+    /**
+     * @param string $username
+     * @param string $password
+     * @param string $account
+     * @return BitbucketRepositoryList
+     */
+    protected function _createRepositoryList($username, $password, $account): BitbucketRepositoryList
+    {
+        $repositoryList = new BitbucketRepositoryList(new Repositories());
+        $repositoryList->setCredentials($username, $password);
+        $repositoryList->createPager($account);
+        return $repositoryList;
+    }
+
+    /**
+     * @param $projectKey
+     * @param $repositoryList
+     * @return mixed
+     */
+    protected function _getInformationOfRepositories($projectKey, $repositoryList)
+    {
+        if (empty($projectKey) === false) {
+            $repoInfo = $repositoryList->getAllForProjectKey($projectKey);
+        } else {
+            $repoInfo = $repositoryList->getAll();
+        }
+        return $repoInfo;
     }
 }
