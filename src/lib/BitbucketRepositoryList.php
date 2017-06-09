@@ -107,7 +107,7 @@ class BitbucketRepositoryList
                 }
             }
             $cachedList->set($allRepositories);
-            $this->cache->saveItem($cachedList);
+            $this->_saveToCache($cachedList);
         }
         return $allRepositories;
     }
@@ -164,5 +164,15 @@ class BitbucketRepositoryList
     {
         $this->_filteredRepositoryList[$repository->name]['slug'] = $repository->slug;
         return $this->_filteredRepositoryList;
+    }
+
+    /**
+     * @param $cachedList
+     */
+    protected function _saveToCache($cachedList)
+    {
+        if (empty($cachedList) === false) {
+            $this->cache->saveItem($cachedList);
+        }
     }
 }
