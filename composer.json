@@ -5,6 +5,7 @@
     "homepage": "https://www.solutiondrive.de",
     "require": {
       "symfony/console": "^3.3",
+      "symfony/yaml": "^3.3",
       "gentle/bitbucket-api": "dev-develop"
     },
     "require-dev": {
