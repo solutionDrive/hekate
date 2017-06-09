@@ -47,6 +47,4 @@ class HekateCache
     {
         $this->cache->save($cacheItem);
     }
-
-
 }

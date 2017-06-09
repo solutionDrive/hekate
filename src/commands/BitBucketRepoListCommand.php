@@ -32,6 +32,7 @@ class BitBucketRepoListCommand extends Command
     const BITBUCKET_CACHE_DIRECTORY = __DIR__ . '/../../cache';
     /** @var  BitBucketConfiguration */
     protected $bitBucketConfiguration;
+    protected $account;
 
     /**
      * Basic Setup
@@ -95,15 +96,15 @@ class BitBucketRepoListCommand extends Command
 
     /**
      * @param $projectKey
-     * @param $repositoryList
+     * @param BitbucketRepositoryList $repositoryList
      * @return mixed
      */
     protected function _getInformationOfRepositories($projectKey, $repositoryList)
     {
         if (empty($projectKey) === false) {
-            $repoInfo = $repositoryList->getAllForProjectKey($projectKey);
+            $repoInfo = $repositoryList->getAllForProjectKey($projectKey, $this->account);
         } else {
-            $repoInfo = $repositoryList->getAll();
+            $repoInfo = $repositoryList->getAll($this->account);
         }
         return $repoInfo;
     }
@@ -153,12 +154,12 @@ class BitBucketRepoListCommand extends Command
      */
     protected function _getAccount(InputInterface $input, OutputInterface $output, $helper)
     {
-        $account = $input->getOption('account');
+        $this->account = $input->getOption('account');
         if (empty($account) && empty($this->bitBucketConfiguration->getAccountName())) {
             $question = new Question('Please enter the name of your Bitbucket Account: ');
-            $account = $helper->ask($input, $output, $question);
+            $this->account = $helper->ask($input, $output, $question);
         }
-        return $account;
+        return $this->account;
     }
 
     protected function _initConfig()

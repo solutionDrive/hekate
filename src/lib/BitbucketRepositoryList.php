@@ -66,11 +66,12 @@ class BitbucketRepositoryList
 
     /**
      * Gathers Information about all Repositories and returns it as Array
+     * @param $account
      * @return array
      */
-    public function getAll()
+    public function getAll($account)
     {
-        $cachedList = $this->cache->getItem('full_list');
+        $cachedList = $this->cache->getItem($account);
         if ($cachedList->isHit()) {
             $this->_filteredRepositoryList = $cachedList->get();
         } else {
@@ -83,8 +84,7 @@ class BitbucketRepositoryList
                 }
                 $this->pager->fetchNext();
             } while ($this->pager->hasNext());
-            $cachedList->set($this->_filteredRepositoryList);
-            $this->cache->saveItem($cachedList);
+            $this->_saveToCache($cachedList, $this->_filteredRepositoryList);
         }
 
         return $this->_filteredRepositoryList;
@@ -92,22 +92,22 @@ class BitbucketRepositoryList
 
     /**
      * @param string $projectKey
+     * @param string $account
      * @return array
      */
-    public function getAllForProjectKey($projectKey)
+    public function getAllForProjectKey($projectKey, $account)
     {
         $cachedList = $this->cache->getItem($projectKey);
         if ($cachedList->isHit()) {
             $allRepositories = $cachedList->get();
         } else {
-            $allRepositories = $this->getAll();
+            $allRepositories = $this->getAll($account);
             foreach ($allRepositories as $repository) {
-                if ($repository['project'] !== $projectKey) {
+                if (isset($repository['project']) && $repository['project'] !== $projectKey) {
                     unset ($allRepositories[$repository['name']]);
                 }
             }
-            $cachedList->set($allRepositories);
-            $this->_saveToCache($cachedList);
+            $this->_saveToCache($cachedList, $allRepositories);
         }
         return $allRepositories;
     }
@@ -169,9 +169,10 @@ class BitbucketRepositoryList
     /**
      * @param $cachedList
      */
-    protected function _saveToCache($cachedList)
+    protected function _saveToCache($cachedList, $allRepositories)
     {
-        if (empty($cachedList) === false) {
+        if (count($allRepositories) > 0) {
+            $cachedList->set($allRepositories);
             $this->cache->saveItem($cachedList);
         }
     }
