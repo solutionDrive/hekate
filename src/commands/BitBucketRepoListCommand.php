@@ -15,6 +15,8 @@ use Bitbucket\API\Repositories;
 use Buzz\Message\Response;
 use sd\hekate\config\BitBucketConfiguration;
 use sd\hekate\lib\BitbucketRepositoryList;
+use sd\hekate\lib\HekateCache;
+use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Helper\QuestionHelper;
@@ -26,6 +28,8 @@ use Symfony\Component\Console\Question\Question;
 
 class BitBucketRepoListCommand extends Command
 {
+    const BITBUCKET_DEFAULT_LIFETIME = 360;
+    const BITBUCKET_CACHE_DIRECTORY = __DIR__ . '/../../cache';
     /** @var  BitBucketConfiguration */
     protected $bitBucketConfiguration;
 
@@ -83,7 +87,7 @@ class BitBucketRepoListCommand extends Command
      */
     protected function _createRepositoryList($username, $password, $account): BitbucketRepositoryList
     {
-        $repositoryList = new BitbucketRepositoryList(new Repositories());
+        $repositoryList = $this->_getBitbucketRepositoryListService();
         $repositoryList->setCredentials($username, $password);
         $repositoryList->createPager($account);
         return $repositoryList;
@@ -147,7 +151,7 @@ class BitBucketRepoListCommand extends Command
      * @param $helper
      * @return mixed
      */
-    protected function _getAccount(InputInterface $input, OutputInterface $output, $helper): mixed
+    protected function _getAccount(InputInterface $input, OutputInterface $output, $helper)
     {
         $account = $input->getOption('account');
         if (empty($account) && empty($this->bitBucketConfiguration->getAccountName())) {
@@ -160,5 +164,22 @@ class BitBucketRepoListCommand extends Command
     protected function _initConfig()
     {
         $this->bitBucketConfiguration = new BitBucketConfiguration();
+    }
+
+    /**
+     * @return BitbucketRepositoryList
+     */
+    protected function _getBitbucketRepositoryListService(): BitbucketRepositoryList
+    {
+        $repositoryList = new BitbucketRepositoryList(
+            new Repositories(),
+            new HekateCache(
+                new FilesystemAdapter(
+                    BitbucketRepositoryList::BITBUCKET_CACHE_KEY,
+                    self::BITBUCKET_DEFAULT_LIFETIME,
+                    self::BITBUCKET_CACHE_DIRECTORY)
+            )
+        );
+        return $repositoryList;
     }
 }
