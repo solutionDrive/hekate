@@ -79,9 +79,9 @@ class BitbucketRepositoryListTest extends TestCase
         $cacheItemProphet->get()->willReturn($expected);
 
 
-        $this->cacheProphet->getItem('full_list')->willReturn($cacheItemProphet->reveal());
+        $this->cacheProphet->getItem($account)->willReturn($cacheItemProphet->reveal());
 
-        self::assertEquals($expected, $this->testSubject->getAll());
+        self::assertEquals($expected, $this->testSubject->getAll($account));
     }
 
     /**
