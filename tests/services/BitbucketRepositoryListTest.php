@@ -18,12 +18,16 @@ class BitbucketRepositoryListTest extends TestCase
     /** @var  \Bitbucket\API\Repositories */
     protected $repositoriesProphet;
 
+    /** @var  \sd\hekate\lib\HekateCache */
+    protected $cacheProphet;
+
     protected function setUp()
     {
         $bitbucketApiRepositoriesProphet = $this->prophesize(\Bitbucket\API\Repositories::class);
 
         $this->repositoriesProphet = $bitbucketApiRepositoriesProphet;
-        $this->testSubject = new BitbucketRepositoryList($this->repositoriesProphet->reveal());
+        $this->cacheProphet = $this->prophesize(\sd\hekate\lib\HekateCache::class);
+        $this->testSubject = new BitbucketRepositoryList($this->repositoriesProphet->reveal(), $this->cacheProphet->reveal());
     }
 
     public function testSetCredentials()
@@ -55,6 +59,7 @@ class BitbucketRepositoryListTest extends TestCase
         $account = 'some_bitbucket_account';
         $repository1 = $this->_stubRepositoryInformation('name_of_repository1', 'project_of_repository1', 'slug_of_repository1');
         $repository2 = $this->_stubRepositoryInformation('name_of_repository2', 'project_of_repository2', 'slug_of_repository2');
+        $this->prepareResponseProphet($repository1, $repository2, $account);
 
         $expected = [
             $repository1->name => [
@@ -69,8 +74,12 @@ class BitbucketRepositoryListTest extends TestCase
             ]
         ];
 
-        $this->prepareResponseProphet($repository1, $repository2, $account);
+        $cacheItemProphet = $this->prophesize('CacheItem')->willImplement(\Psr\Cache\CacheItemInterface::class);
+        $cacheItemProphet->isHit()->willReturn(true);
+        $cacheItemProphet->get()->willReturn($expected);
 
+
+        $this->cacheProphet->getItem('full_list')->willReturn($cacheItemProphet->reveal());
 
         self::assertEquals($expected, $this->testSubject->getAll());
     }

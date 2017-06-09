@@ -20,6 +20,7 @@ use Bitbucket\API\Repositories;
  */
 class BitbucketRepositoryList
 {
+    const BITBUCKET_CACHE_KEY = 'bitbucket';
     /** @var  string */
     protected $password;
 
@@ -31,13 +32,18 @@ class BitbucketRepositoryList
 
     /** @var  array */
     protected $_filteredRepositoryList;
+    /** @var HekateCache  */
+    protected $cache;
 
     /**
      * BitbucketRepositoryList constructor.
+     * @param Repositories $repositories
+     * @param HekateCache  $cache
      */
-    public function __construct(Repositories $repositories)
+    public function __construct(Repositories $repositories, HekateCache $cache)
     {
         $this->repositories = $repositories;
+        $this->cache = $cache;
     }
 
     /**
@@ -64,15 +70,23 @@ class BitbucketRepositoryList
      */
     public function getAll()
     {
-        $this->_filteredRepositoryList = [];
-        do {
-            $responseForPage = $this->pager->getCurrent();
-            $reposOfPage = json_decode($responseForPage->getContent());
-            foreach ($reposOfPage->values as $repository) {
-                $this->_filteredRepositoryList = $this->_addRepositoryInformation($repository);
-            }
-            $this->pager->fetchNext();
-        } while ($this->pager->hasNext());
+        $cachedList = $this->cache->getItem('full_list');
+        if ($cachedList->isHit()) {
+            $this->_filteredRepositoryList = $cachedList->get();
+        } else {
+            $this->_filteredRepositoryList = [];
+            do {
+                $responseForPage = $this->pager->getCurrent();
+                $reposOfPage = json_decode($responseForPage->getContent());
+                foreach ($reposOfPage->values as $repository) {
+                    $this->_filteredRepositoryList = $this->_addRepositoryInformation($repository);
+                }
+                $this->pager->fetchNext();
+            } while ($this->pager->hasNext());
+            $cachedList->set($this->_filteredRepositoryList);
+            $this->cache->saveItem($cachedList);
+        }
+
         return $this->_filteredRepositoryList;
     }
 
@@ -82,13 +96,20 @@ class BitbucketRepositoryList
      */
     public function getAllForProjectKey($projectKey)
     {
-        $aAllRepositories = $this->getAll();
-        foreach ($aAllRepositories as $repository) {
-            if ($repository['project'] !== $projectKey) {
-                unset ($aAllRepositories[$repository['name']]);
+        $cachedList = $this->cache->getItem($projectKey);
+        if ($cachedList->isHit()) {
+            $allRepositories = $cachedList->get();
+        } else {
+            $allRepositories = $this->getAll();
+            foreach ($allRepositories as $repository) {
+                if ($repository['project'] !== $projectKey) {
+                    unset ($allRepositories[$repository['name']]);
+                }
             }
+            $cachedList->set($allRepositories);
+            $this->cache->saveItem($cachedList);
         }
-        return $aAllRepositories;
+        return $allRepositories;
     }
 
     /**
