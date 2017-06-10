@@ -1,12 +1,14 @@
-#Hekate
+# Hekate
 
 Hekate is a commandline-application to manage repositories hosted on services like bitbucket from your local command line
 
-##Installation
+At the moment the only supported Provider is Bitbucket. Others like github will follow
+
+## Installation
 
 * Clone this repository
 
-##Usage
+## Usage
 
 ### I. Bitbucket
 #### Commands
