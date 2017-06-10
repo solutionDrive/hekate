@@ -14,6 +14,8 @@ use Symfony\Component\Yaml\Yaml;
 
 class BitBucketConfiguration
 {
+    const BITBUCKET_CONFIG_FILE_LOCATION = __DIR__ . '/../../hekate.yml';
+    const BITBUCKET_CONFIG_KEY = 'bitbucket';
 
 
     /**
@@ -21,7 +23,7 @@ class BitBucketConfiguration
      */
     public function __construct()
     {
-        $this->config = Yaml::parse(file_get_contents(__DIR__.'/../../hekate.yml'));
+        $this->config = Yaml::parse(file_get_contents(self::BITBUCKET_CONFIG_FILE_LOCATION));
     }
 
     /**
@@ -36,6 +38,10 @@ class BitBucketConfiguration
         return '';
     }
 
+    public function setUserName($username)
+    {
+        $this->_setConfigParameter('username', $username);
+    }
     /**
      * @return string
      */
@@ -45,6 +51,15 @@ class BitBucketConfiguration
             return $this->_getConfigParameter('password');
         }
         return '';
+    }
+
+    /**
+     * @todo evtl hier das pw mit dem public key des rechners verschlusseln
+     * @param $password
+     */
+    public function setPassword($password)
+    {
+        $this->_setConfigParameter('password', $password);
     }
 
     /**
@@ -59,13 +74,18 @@ class BitBucketConfiguration
     }
 
 
+    public function setAccountName($accountName)
+    {
+        $this->_setConfigParameter('account', $accountName);
+    }
+
     /**
      * @param string $nameOfConfigParameter
      * @return bool
      */
     protected function _hasConfigParameter($nameOfConfigParameter):bool
     {
-        return empty($this->config['bitbucket'][$nameOfConfigParameter]) === false;
+        return empty($this->config[self::BITBUCKET_CONFIG_KEY][$nameOfConfigParameter]) === false;
     }
 
     /**
@@ -74,6 +94,20 @@ class BitBucketConfiguration
      */
     protected function _getConfigParameter($nameOfConfigParameter)
     {
-        return $this->config['bitbucket'][$nameOfConfigParameter];
+        return $this->config[self::BITBUCKET_CONFIG_KEY][$nameOfConfigParameter];
+    }
+
+    /**
+     * @param string $nameOfConfigParameter
+     * @param string $valueOfConfigParameter
+     */
+    protected function _setConfigParameter($nameOfConfigParameter, $valueOfConfigParameter)
+    {
+        $this->config[self::BITBUCKET_CONFIG_KEY][$nameOfConfigParameter] = $valueOfConfigParameter;
+    }
+
+    public function save()
+    {
+        file_put_contents(self::BITBUCKET_CONFIG_FILE_LOCATION, Yaml::dump($this->config));
     }
 }
