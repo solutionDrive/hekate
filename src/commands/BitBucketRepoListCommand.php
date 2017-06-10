@@ -23,16 +23,17 @@ use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
 
-class BitBucketRepoListCommand extends Command
+class BitBucketRepoListCommand extends AbstractHekateCommand
 {
     const BITBUCKET_DEFAULT_LIFETIME = 360;
     const BITBUCKET_CACHE_DIRECTORY = __DIR__ . '/../../cache';
     /** @var  BitBucketConfiguration */
-    protected $bitBucketConfiguration;
     protected $account;
+    protected $forceQuestions;
 
     /**
      * Basic Setup
@@ -47,6 +48,7 @@ class BitBucketRepoListCommand extends Command
             ->addOption('password', 'p', InputArgument::OPTIONAL, 'The password of the bitbucket-User')
             ->addOption('account', 'a', InputArgument::OPTIONAL, 'account from which private repositories will be fetched')
             ->addOption('projectkey', 'k', InputArgument::OPTIONAL, 'Filter the repositories by project key')
+            ->addOption('ask-questions', 'aq', InputOption::VALUE_NONE, 'Give Credentials on commandline prompt')
         ;
 
     }
@@ -59,6 +61,8 @@ class BitBucketRepoListCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->_initConfig();
+
+        $this->forceQuestions = (bool)$input->getOption('ask-questions');
 
         /** @var QuestionHelper $helper */
         $helper = $this->getHelper('question');
@@ -121,7 +125,7 @@ class BitBucketRepoListCommand extends Command
          * First get Input from Console
          */
         $username = $input->getOption('username');
-        if (empty($username) && empty($username = $this->bitBucketConfiguration->getUserName())) {
+        if ($this->_needToAskForUsername($username)) {
             $question = new Question('Please enter your username: ');
             $username = $helper->ask($input, $output, $question);
         }
@@ -137,7 +141,7 @@ class BitBucketRepoListCommand extends Command
     protected function _getPassword(InputInterface $input, OutputInterface $output, $helper): string
     {
         $password = $input->getOption('password');
-        if (empty($password) && empty($password = $this->bitBucketConfiguration->getPassword())) {
+        if ($this->_needToAskForPassword($password)) {
             $question = new Question('Please enter your password: ');
             $question->setHidden(true);
             $question->setHiddenFallback(false);
@@ -155,16 +159,11 @@ class BitBucketRepoListCommand extends Command
     protected function _getAccount(InputInterface $input, OutputInterface $output, $helper)
     {
         $this->account = $input->getOption('account');
-        if (empty($account) && empty($this->bitBucketConfiguration->getAccountName())) {
+        if ($this->_needToAskForAccount()) {
             $question = new Question('Please enter the name of your Bitbucket Account: ');
             $this->account = $helper->ask($input, $output, $question);
         }
         return $this->account;
-    }
-
-    protected function _initConfig()
-    {
-        $this->bitBucketConfiguration = new BitBucketConfiguration();
     }
 
     /**
@@ -182,5 +181,39 @@ class BitBucketRepoListCommand extends Command
             )
         );
         return $repositoryList;
+    }
+
+    /**
+     * @return bool
+     */
+    protected function _needToAskForAccount(): bool
+    {
+        return $this->forceQuestions || (is_null($this->account) && $this->_isNotInConfig());
+    }
+
+    /**
+     * @return bool
+     */
+    protected function _isNotInConfig(): bool
+    {
+        return empty($this->account = $this->bitBucketConfiguration->getAccountName());
+    }
+
+    /**
+     * @param $username
+     * @return bool
+     */
+    protected function _needToAskForUsername(&$username): bool
+    {
+        return $this->forceQuestions || (empty($username) && empty($username = $this->bitBucketConfiguration->getUserName()));
+    }
+
+    /**
+     * @param $password
+     * @return bool
+     */
+    protected function _needToAskForPassword(&$password): bool
+    {
+        return $this->forceQuestions || (empty($password) && empty($password = $this->bitBucketConfiguration->getPassword()));
     }
 }
