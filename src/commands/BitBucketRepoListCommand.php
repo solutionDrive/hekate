@@ -31,8 +31,14 @@ class BitBucketRepoListCommand extends AbstractHekateCommand
 {
     const BITBUCKET_DEFAULT_LIFETIME = 360;
     const BITBUCKET_CACHE_DIRECTORY = __DIR__ . '/../../cache';
-    /** @var  BitBucketConfiguration */
+
+    /** @var  string */
     protected $account;
+    /** @var  string */
+    protected $username;
+    /** @var  string */
+    protected $password;
+    /** @var  bool */
     protected $forceQuestions;
 
     /**
@@ -69,14 +75,11 @@ class BitBucketRepoListCommand extends AbstractHekateCommand
 
         $projectKey = $input->getOption('projectkey');
 
-        $username   = $this->_getUserName($input, $output, $helper);
-        $password   = $this->_getPassword($input, $output, $helper);
-        $account    = $this->_getAccount($input, $output, $helper);
+        $this->username   = $this->_getUserName($input, $output, $helper);
+        $this->password   = $this->_getPassword($input, $output, $helper);
+        $this->account    = $this->_getAccount($input, $output, $helper);
 
-        $repositoryList = $this->_createRepositoryList($username, $password, $account);
-
-        $repoInfo = $this->_getInformationOfRepositories($projectKey, $repositoryList);
-
+        $repoInfo = $this->_getInformationOfRepositories($projectKey);
 
         $table = new Table($output);
         $table->setHeaders(['name', 'project', 'slug']);
@@ -85,26 +88,24 @@ class BitBucketRepoListCommand extends AbstractHekateCommand
     }
 
     /**
-     * @param string $username
-     * @param string $password
-     * @param string $account
      * @return BitbucketRepositoryList
      */
-    protected function _createRepositoryList($username, $password, $account): BitbucketRepositoryList
+    protected function _createRepositoryList(): BitbucketRepositoryList
     {
         $repositoryList = $this->_getBitbucketRepositoryListService();
-        $repositoryList->setCredentials($username, $password);
-        $repositoryList->createPager($account);
+        $repositoryList->setCredentials($this->username, $this->password);
+        $repositoryList->createPager($this->account);
         return $repositoryList;
     }
 
     /**
-     * @param $projectKey
-     * @param BitbucketRepositoryList $repositoryList
+     * @param string $projectKey
      * @return mixed
      */
-    protected function _getInformationOfRepositories($projectKey, $repositoryList)
+    protected function _getInformationOfRepositories($projectKey)
     {
+        $repositoryList = $this->_createRepositoryList();
+
         if (empty($projectKey) === false) {
             $repoInfo = $repositoryList->getAllForProjectKey($projectKey, $this->account);
         } else {
@@ -124,12 +125,12 @@ class BitBucketRepoListCommand extends AbstractHekateCommand
         /**
          * First get Input from Console
          */
-        $username = $input->getOption('username');
-        if ($this->_needToAskForUsername($username)) {
+        $this->username = $input->getOption('username');
+        if ($this->_needToAskForUsername()) {
             $question = new Question('Please enter your username: ');
-            $username = $helper->ask($input, $output, $question);
+            $this->username = $helper->ask($input, $output, $question);
         }
-        return $username;
+        return $this->username;
     }
 
     /**
@@ -140,14 +141,14 @@ class BitBucketRepoListCommand extends AbstractHekateCommand
      */
     protected function _getPassword(InputInterface $input, OutputInterface $output, $helper): string
     {
-        $password = $input->getOption('password');
-        if ($this->_needToAskForPassword($password)) {
+        $this->password = $input->getOption('password');
+        if ($this->_needToAskForPassword()) {
             $question = new Question('Please enter your password: ');
             $question->setHidden(true);
             $question->setHiddenFallback(false);
-            $password = $helper->ask($input, $output, $question);
+            $this->password = $helper->ask($input, $output, $question);
         }
-        return $password;
+        return $this->password;
     }
 
     /**
@@ -188,32 +189,30 @@ class BitBucketRepoListCommand extends AbstractHekateCommand
      */
     protected function _needToAskForAccount(): bool
     {
-        return $this->forceQuestions || (is_null($this->account) && $this->_isNotInConfig());
+        return $this->forceQuestions || (is_null($this->account) && $this->_accountIsNotInConfig());
     }
 
     /**
      * @return bool
      */
-    protected function _isNotInConfig(): bool
+    protected function _accountIsNotInConfig(): bool
     {
         return empty($this->account = $this->bitBucketConfiguration->getAccountName());
     }
 
     /**
-     * @param $username
      * @return bool
      */
-    protected function _needToAskForUsername(&$username): bool
+    protected function _needToAskForUsername(): bool
     {
-        return $this->forceQuestions || (empty($username) && empty($username = $this->bitBucketConfiguration->getUserName()));
+        return $this->forceQuestions || (empty($this->username) && empty($this->username = $this->bitBucketConfiguration->getUserName()));
     }
 
     /**
-     * @param $password
      * @return bool
      */
-    protected function _needToAskForPassword(&$password): bool
+    protected function _needToAskForPassword(): bool
     {
-        return $this->forceQuestions || (empty($password) && empty($password = $this->bitBucketConfiguration->getPassword()));
+        return $this->forceQuestions || (empty($this->password) && empty($this->password = $this->bitBucketConfiguration->getPassword()));
     }
 }
