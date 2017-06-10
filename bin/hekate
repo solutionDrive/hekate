@@ -3,8 +3,24 @@
 
 require __DIR__.'/../vendor/autoload.php';
 
+use sd\hekate\commands\BitBucketInitCommand;
+use sd\hekate\commands\BitBucketRepoListCommand;
 use Symfony\Component\Console\Application;
 
 $application = new Application();
+
+/**
+ * 1. bitbucket:repo-list
+ */
+$bitBucketInitCommand = new BitBucketInitCommand();
+$bitBucketListCommand = new BitBucketRepoListCommand();
+
+$application->addCommands(
+        [
+                $bitBucketInitCommand,
+                $bitBucketListCommand
+        ]
+);
+
 
 $application->run();
