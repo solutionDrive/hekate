@@ -43,6 +43,7 @@ The following Parameters will be asked if omitted:
 Changelog
 ---------
 - UNRELEASED
+- v0.1
     - [ADDED] Command for Config-Init
     - [ADDED] YAML-Component for reading / writing Config-Files
     - [ADDED] possibility to filter the repository-List for a given projectkey
