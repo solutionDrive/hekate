@@ -27,6 +27,14 @@ class BitBucketConfiguration
     }
 
     /**
+     * Saves the current Cofig to the config-file
+     */
+    public function save()
+    {
+        file_put_contents(self::BITBUCKET_CONFIG_FILE_LOCATION, Yaml::dump($this->config));
+    }
+
+    /**
      * @return string
      */
     public function getUserName():string
@@ -104,10 +112,5 @@ class BitBucketConfiguration
     protected function _setConfigParameter($nameOfConfigParameter, $valueOfConfigParameter)
     {
         $this->config[self::BITBUCKET_CONFIG_KEY][$nameOfConfigParameter] = $valueOfConfigParameter;
-    }
-
-    public function save()
-    {
-        file_put_contents(self::BITBUCKET_CONFIG_FILE_LOCATION, Yaml::dump($this->config));
     }
 }
