@@ -29,16 +29,35 @@ class BitBucketConfigurationTest extends TestCase
         self::assertEquals('test_user', $this->testSubject->getUserName());
     }
 
+    public function testGetUserNameIsEmpty()
+    {
+        $this->_createTestSubjectWithEmptyVirtualConfigFile();
+        self::assertEquals('', $this->testSubject->getUserName());
+    }
+
     public function testGetPassword()
     {
         $this->_createTestSubjectWithVirtualConfigFile();
         self::assertEquals('test_password', $this->testSubject->getPassword());
     }
 
+
+    public function testGetPasswordIsEmpty()
+    {
+        $this->_createTestSubjectWithEmptyVirtualConfigFile();
+        self::assertEquals('', $this->testSubject->getPassword());
+    }
+
     public function testGetAccount()
     {
         $this->_createTestSubjectWithVirtualConfigFile();
         self::assertEquals('test_account', $this->testSubject->getAccountName());
+    }
+
+    public function testGetAccountIsEmpty()
+    {
+        $this->_createTestSubjectWithEmptyVirtualConfigFile();
+        self::assertEquals('', $this->testSubject->getAccountName());
     }
 
     public function testSetOnlyUsername()
