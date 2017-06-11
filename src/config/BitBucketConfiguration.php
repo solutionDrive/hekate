@@ -14,16 +14,23 @@ use Symfony\Component\Yaml\Yaml;
 
 class BitBucketConfiguration
 {
-    const BITBUCKET_CONFIG_FILE_LOCATION = __DIR__ . '/../../hekate.yml';
+    const BITBUCKET_CONFIG_FILE_LOCATION = __DIR__ . '/../../bitbucket.yml';
     const BITBUCKET_CONFIG_KEY = 'bitbucket';
 
+    /** @var  string */
+    protected $_pathToConfig;
+
+    /** @var array */
+    protected $config;
 
     /**
      * BitBucketConfiguration constructor.
+     * @param string $pathToConfig
      */
-    public function __construct()
+    public function __construct($pathToConfig = self::BITBUCKET_CONFIG_FILE_LOCATION)
     {
-        $this->config = Yaml::parse(file_get_contents(self::BITBUCKET_CONFIG_FILE_LOCATION));
+        $this->_setPathToConfig($pathToConfig);
+        $this->config = Yaml::parse(file_get_contents($pathToConfig));
     }
 
     /**
@@ -31,7 +38,7 @@ class BitBucketConfiguration
      */
     public function save()
     {
-        file_put_contents(self::BITBUCKET_CONFIG_FILE_LOCATION, Yaml::dump($this->config));
+        file_put_contents($this->_getPathToConfig(), Yaml::dump($this->config));
     }
 
     /**
@@ -81,7 +88,9 @@ class BitBucketConfiguration
         return '';
     }
 
-
+    /**
+     * @param $accountName
+     */
     public function setAccountName($accountName)
     {
         $this->_setConfigParameter('account', $accountName);
@@ -112,5 +121,21 @@ class BitBucketConfiguration
     protected function _setConfigParameter($nameOfConfigParameter, $valueOfConfigParameter)
     {
         $this->config[self::BITBUCKET_CONFIG_KEY][$nameOfConfigParameter] = $valueOfConfigParameter;
+    }
+
+    /**
+     * @param string $pathToConfig
+     */
+    private function _setPathToConfig($pathToConfig)
+    {
+        $this->_pathToConfig = $pathToConfig;
+    }
+
+    /**
+     * @return string
+     */
+    private function _getPathToConfig()
+    {
+        return $this->_pathToConfig;
     }
 }
