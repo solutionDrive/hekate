@@ -53,7 +53,7 @@ class BitbucketRepositoryListTest extends TestCase
         $this->testSubject->createPager($account);
     }
 
-    public function testGetAll()
+    public function testGetAllFromCache()
     {
 
         $account = 'some_bitbucket_account';
@@ -82,6 +82,113 @@ class BitbucketRepositoryListTest extends TestCase
         $this->cacheProphet->getItem($account)->willReturn($cacheItemProphet->reveal());
 
         self::assertEquals($expected, $this->testSubject->getAll($account));
+    }
+
+    public function testGetAllWithoutCache()
+    {
+        $account = 'some_bitbucket_account';
+        $repository1 = $this->_stubRepositoryInformation('name_of_repository1', 'project_of_repository1', 'slug_of_repository1');
+        $repository2 = $this->_stubRepositoryInformation('name_of_repository2', 'project_of_repository2', 'slug_of_repository2');
+        $this->prepareResponseProphet($repository1, $repository2, $account);
+
+        $expected = [
+            $repository1->name => [
+                'name' => $repository1->name,
+                'project' => $repository1->project->name,
+                'slug'  => $repository1->slug
+            ],
+            $repository2->name => [
+                'name' => $repository2->name,
+                'project' => $repository2->project->name,
+                'slug'  => $repository2->slug
+            ]
+        ];
+
+        $cacheItemProphet = $this->prophesize('CacheItem')->willImplement(\Psr\Cache\CacheItemInterface::class);
+        $cacheItemProphet->isHit()->willReturn(false);
+        $cacheItemProphet->set($expected)->shouldBeCalled();
+
+
+        $this->cacheProphet->getItem($account)->willReturn($cacheItemProphet);
+        $this->cacheProphet->saveItem($cacheItemProphet->reveal())->shouldBeCalled();
+
+        self::assertEquals($expected, $this->testSubject->getAll($account));
+    }
+
+
+    public function testGetAllForProjectKeyWithCache()
+    {
+        $account = 'some_bitbucket_account';
+        $projectKey = 'project1';
+        $repository1 = $this->_stubRepositoryInformation('name_of_repository1', $projectKey, 'slug_of_repository1');
+        $repository2 = $this->_stubRepositoryInformation('name_of_repository2', 'project2', 'slug_of_repository2');
+
+        $this->prepareResponseProphet($repository1, $repository2, $account);
+
+        $expected = [
+            $repository1->name => [
+                'name' => $repository1->name,
+                'project' => $repository1->project->name,
+                'slug'  => $repository1->slug
+            ]
+        ];
+
+        $cacheItemProphet = $this->prophesize('CacheItem')->willImplement(\Psr\Cache\CacheItemInterface::class);
+        $cacheItemProphet->isHit()->willReturn(true);
+        $cacheItemProphet->get()->willReturn($expected);
+
+
+        $this->cacheProphet->getItem($projectKey)->willReturn($cacheItemProphet->reveal());
+
+        self::assertEquals($expected, $this->testSubject->getAllForProjectKey($projectKey, $account));
+    }
+
+    public function testGetAllForProjectKeyWithNoCacheHit()
+    {
+        $account = 'some_bitbucket_account';
+        $projectKey = 'project1';
+        $repository1 = $this->_stubRepositoryInformation('name_of_repository1', $projectKey, 'slug_of_repository1');
+        $repository2 = $this->_stubRepositoryInformation('name_of_repository2', 'project2', 'slug_of_repository2');
+
+        $this->prepareResponseProphet($repository1, $repository2, $account);
+
+        $expected = [
+            $repository1->name => [
+                'name' => $repository1->name,
+                'project' => $repository1->project->name,
+                'slug'  => $repository1->slug
+            ]
+        ];
+
+        $cacheItemProphetNoHit = $this->prophesize('CacheItem')->willImplement(\Psr\Cache\CacheItemInterface::class);
+        $cacheItemProphetNoHit->isHit()->willReturn(false);
+        $cacheItemProphetNoHit->set($expected)->shouldBeCalled($expected);
+
+
+
+        $responseForAccount = [
+            $repository1->name => [
+                'name' => $repository1->name,
+                'project' => $repository1->project->name,
+                'slug'  => $repository1->slug
+            ],
+            $repository2->name => [
+                'name' => $repository2->name,
+                'project' => $repository2->project->name,
+                'slug'  => $repository2->slug
+            ]
+        ];
+
+        $cacheItemProphet = $this->prophesize('CacheItem')->willImplement(\Psr\Cache\CacheItemInterface::class);
+        $cacheItemProphet->isHit()->willReturn(true);
+        $cacheItemProphet->get()->willReturn($responseForAccount);
+
+
+        $this->cacheProphet->getItem($projectKey)->willReturn($cacheItemProphetNoHit->reveal());
+        $this->cacheProphet->getItem($account)->willReturn($cacheItemProphet->reveal());
+        $this->cacheProphet->saveItem($cacheItemProphetNoHit->reveal())->shouldBeCalled();
+
+        self::assertEquals($expected, $this->testSubject->getAllForProjectKey($projectKey, $account));
     }
 
     /**
