@@ -2,3 +2,5 @@ vendor/
 .idea/
 cache
 hekate.yml
+bitbucket.yml
+coverage/
