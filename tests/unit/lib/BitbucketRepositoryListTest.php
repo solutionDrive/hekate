@@ -44,6 +44,7 @@ class BitbucketRepositoryListTest extends TestCase
         $responseProphet = $this->prophesize(\Buzz\Message\Response::class);
         $responseProphet->isOk()->willReturn(true);
         $response = $responseProphet->reveal();
+
         $this->repositoriesProphet
             ->all($account)
             ->shouldBeCalled()

@@ -12,9 +12,7 @@ namespace sd\hekate\commands;
 
 
 use sd\hekate\config\BitBucketConfiguration;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\QuestionHelper;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -26,6 +24,9 @@ use Symfony\Component\Console\Question\Question;
  */
 class BitBucketInitCommand extends AbstractHekateCommand
 {
+    /**
+     * Configure the Command
+     */
     protected function configure()
     {
         $this
@@ -36,6 +37,11 @@ class BitBucketInitCommand extends AbstractHekateCommand
         ;
     }
 
+    /**
+     * @param InputInterface  $input
+     * @param OutputInterface $output
+     * @return int|null|void
+     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->_initConfig();
@@ -62,9 +68,9 @@ class BitBucketInitCommand extends AbstractHekateCommand
     }
 
     /**
-     * @param InputInterface $input
+     * @param InputInterface  $input
      * @param OutputInterface $output
-     * @param $helper
+     * @param QuestionHelper  $helper
      */
     protected function _askAccount(InputInterface $input, OutputInterface $output, $helper)
     {
@@ -73,14 +79,25 @@ class BitBucketInitCommand extends AbstractHekateCommand
         $this->bitBucketConfiguration->setAccountName($account);
     }
 
-    protected function _askUsername($input, $output, $helper)
+    /**
+     * @param InputInterface  $input
+     * @param OutputInterface $output
+     * @param QuestionHelper  $helper
+     */
+    protected function _askUsername(InputInterface $input, OutputInterface $output, $helper)
     {
         $question = new Question('Your Bitbucket Username: ');
         $username = $helper->ask($input, $output, $question);
         $this->bitBucketConfiguration->setUserName($username);
     }
 
-    protected function _askPassword($input, $output, $helper)
+    /**
+     * Ask the User for password on the Commandline
+     * @param InputInterface  $input
+     * @param OutputInterface $output
+     * @param QuestionHelper  $helper
+     */
+    protected function _askPassword(InputInterface $input, OutputInterface $output, $helper)
     {
         $question = new Question('Your Bitbucket Password - no encryption yet so watch out!!: ');
         $question->setHidden(true);
@@ -90,10 +107,11 @@ class BitBucketInitCommand extends AbstractHekateCommand
         $this->bitBucketConfiguration->setPassword($password);
     }
 
+    /**
+     * Saves the config-array to the configured yaml-File
+     */
     protected function _save()
     {
         $this->bitBucketConfiguration->save();
     }
-
-
 }
