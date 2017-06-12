@@ -8,7 +8,14 @@ At the moment the only supported Provider is Bitbucket. Others like github will 
 
 ## Installation
 
-* Clone this repository
+###### Clone this repository
+```bash
+git clone https://github.com/solutionDrive/hekate.git
+```
+###### Install Dependencies via [composer](https://getcomposer.org/)
+```bash
+composer install --no-dev
+```
 
 ## Usage
 
@@ -17,7 +24,7 @@ At the moment the only supported Provider is Bitbucket. Others like github will 
 
 ##### bitbucket:init
 ```bash
-php bin/hekate bitbucket:init [-f|--force]
+php bin/hekate bitbucket:init [-f|--force] [-c|--config=PATH_TO_CONFIGFILE]
 ```
 will ask questions about setting-parameters and write it to the file hekate.yml in the root-folder.
 If file already exists, no questions are asked and an info is displayed. With the --force option questions
@@ -30,7 +37,7 @@ The available settings for Hekate are:
 
 ##### bitbucket:repo-list
 ```bash
-php bin/hekate bitbucket:repo-list [-u|--username] [-p|--password] [-a|--account] [-k|--projectkey]
+php bin/hekate bitbucket:repo-list [-u|--username=USERNAME] [-p|--password=PASSWORD] [-a|--account=ACCOUNT] [-k|--projectkey=PROJECTKEY] [-c|--config=PATH_TO_CONFIGFILE]
 ```
 will get a List of all Repositories for repositorys for the given parameters.
 All Parameters are optional for the commandline. 
@@ -45,6 +52,8 @@ The following Parameters will be asked if omitted:
 Changelog
 ---------
 - UNRELEASED
+    - [ADDED] Option to Commands for alternative config-files
+    - [CHANGED] AbstractHekateCommand is now AbstractBitbucketCommand
 - v0.1
     - [ADDED] Command for Config-Init
     - [ADDED] YAML-Component for reading / writing Config-Files
