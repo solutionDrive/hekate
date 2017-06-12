@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/solutionDrive/hekate.svg?branch=master)](https://travis-ci.org/solutionDrive/hekate)
+
 # Hekate
 
 Hekate is a commandline-application to manage repositories hosted on services like bitbucket from your local command line
