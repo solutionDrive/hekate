@@ -22,7 +22,7 @@ use Symfony\Component\Console\Question\Question;
  * Class BitBucketInitCommand
  * @package sd\hekate\commands
  */
-class BitBucketInitCommand extends AbstractHekateCommand
+class BitBucketInitCommand extends AbstractBitbucketCommand
 {
     /**
      * Configure the Command
@@ -33,7 +33,8 @@ class BitBucketInitCommand extends AbstractHekateCommand
             ->setName('bitbucket:init')
             ->setDescription('Creates the config for interacting with Hekate')
             ->setHelp('Command to generate a configuration file interactive for all available settings')
-            ->addOption('--force', '-f', InputOption::VALUE_NONE, 'Force config-file initialisation')
+            ->addOption('force', 'f', InputOption::VALUE_NONE, 'Force config-file initialisation')
+            ->addOption('config', 'c', InputOption::VALUE_OPTIONAL, 'Alternative config file for your bitbucket-settings', realpath(BitBucketConfiguration::BITBUCKET_CONFIG_FILE_LOCATION))
         ;
     }
 
@@ -44,14 +45,15 @@ class BitBucketInitCommand extends AbstractHekateCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->_initConfig();
+        $pathToConfig = $input->getOption('config');
+        $this->_initConfig($pathToConfig);
 
         $forceMode = $input->getOption('force');
 
         if (empty($forceMode)) {
-            if (file_exists(realpath(BitBucketConfiguration::BITBUCKET_CONFIG_FILE_LOCATION))) {
+            if (file_exists(realpath($pathToConfig))) {
                 $output->writeln('<info>There is already a Config File in Place in '
-                    .realpath(BitBucketConfiguration::BITBUCKET_CONFIG_FILE_LOCATION).
+                    .realpath($pathToConfig).
                     ' - use --force to create the file anyway or edit it manually</info>');
                 exit();
             }

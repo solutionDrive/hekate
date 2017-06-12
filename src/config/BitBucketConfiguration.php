@@ -30,7 +30,9 @@ class BitBucketConfiguration
     public function __construct($pathToConfig = self::BITBUCKET_CONFIG_FILE_LOCATION)
     {
         $this->_setPathToConfig($pathToConfig);
-        $this->config = Yaml::parse(file_get_contents($pathToConfig));
+        if (file_exists($pathToConfig)) {
+            $this->config = Yaml::parse(file_get_contents($pathToConfig));
+        }
     }
 
     /**
@@ -69,7 +71,7 @@ class BitBucketConfiguration
     }
 
     /**
-     * @todo evtl hier das pw mit dem public key des rechners verschlusseln
+     * @todo maybe encryption could go here
      * @param $password
      */
     public function setPassword($password)
