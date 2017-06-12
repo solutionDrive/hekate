@@ -11,6 +11,7 @@
 namespace sd\hekate\commands;
 
 use Bitbucket\API\Repositories;
+use sd\hekate\config\BitBucketConfiguration;
 use sd\hekate\lib\BitbucketRepositoryList;
 use sd\hekate\lib\HekateCache;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
@@ -23,10 +24,10 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
 
-class BitBucketRepoListCommand extends AbstractHekateCommand
+class BitBucketRepoListCommand extends AbstractBitbucketCommand
 {
     /** int */
-    const BITBUCKET_DEFAULT_LIFETIME = 360;
+    const BITBUCKET_DEFAULT_LIFETIME = 86400; // 24 - hours
 
     /** string */
     const BITBUCKET_CACHE_DIRECTORY = __DIR__ . '/../../cache';
@@ -54,6 +55,7 @@ class BitBucketRepoListCommand extends AbstractHekateCommand
             ->addOption('account', 'a', InputArgument::OPTIONAL, 'account from which private repositories will be fetched')
             ->addOption('projectkey', 'k', InputArgument::OPTIONAL, 'Filter the repositories by project key')
             ->addOption('ask-questions', 'aq', InputOption::VALUE_NONE, 'Give Credentials on commandline prompt')
+            ->addOption('config', 'c', InputOption::VALUE_OPTIONAL, 'Alternative config file for your bitbucket-settings', realpath(BitBucketConfiguration::BITBUCKET_CONFIG_FILE_LOCATION))
         ;
 
     }
@@ -65,7 +67,8 @@ class BitBucketRepoListCommand extends AbstractHekateCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->_initConfig();
+        $pathToConfig = $input->getOption('config');
+        $this->_initConfig($pathToConfig);
 
         $this->forceQuestions = (bool)$input->getOption('ask-questions');
 
