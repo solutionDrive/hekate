@@ -14,6 +14,10 @@ namespace sd\hekate\lib;
 use Psr\Cache\CacheItemInterface;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 
+/**
+ * Class HekateCache
+ * @package sd\hekate\lib
+ */
 class HekateCache
 {
     /** @var FilesystemAdapter  */
@@ -28,7 +32,6 @@ class HekateCache
         $this->cache = $cache;
     }
 
-
     /**
      * @param $key
      * @return mixed|\Symfony\Component\Cache\CacheItem
@@ -38,11 +41,18 @@ class HekateCache
         return $this->cache->getItem($key);
     }
 
+    /**
+     * @param $cacheKeys
+     * @return array|\Generator|\Traversable
+     */
     public function getItems($cacheKeys)
     {
         return $this->cache->getItems($cacheKeys);
     }
 
+    /**
+     * @param CacheItemInterface $cacheItem
+     */
     public function saveItem(CacheItemInterface $cacheItem)
     {
         $this->cache->save($cacheItem);
