@@ -14,13 +14,13 @@ namespace sd\hekate\commands;
 use sd\hekate\config\BitBucketConfiguration;
 use Symfony\Component\Console\Command\Command;
 
-class AbstractHekateCommand extends Command
+class AbstractBitbucketCommand extends Command
 {
     /** @var  BitBucketConfiguration */
     protected $bitBucketConfiguration;
 
-    protected function _initConfig()
+    protected function _initConfig($pathToConfigFile = BitBucketConfiguration::BITBUCKET_CONFIG_FILE_LOCATION)
     {
-        $this->bitBucketConfiguration = new BitBucketConfiguration();
+        $this->bitBucketConfiguration = new BitBucketConfiguration($pathToConfigFile);
     }
 }

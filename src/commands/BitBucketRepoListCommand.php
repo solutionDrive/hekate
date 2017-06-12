@@ -23,7 +23,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
 
-class BitBucketRepoListCommand extends AbstractHekateCommand
+class BitBucketRepoListCommand extends AbstractBitbucketCommand
 {
     /** int */
     const BITBUCKET_DEFAULT_LIFETIME = 360;

@@ -22,7 +22,7 @@ use Symfony\Component\Console\Question\Question;
  * Class BitBucketInitCommand
  * @package sd\hekate\commands
  */
-class BitBucketInitCommand extends AbstractHekateCommand
+class BitBucketInitCommand extends AbstractBitbucketCommand
 {
     /**
      * Configure the Command
