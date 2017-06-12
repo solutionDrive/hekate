@@ -27,7 +27,7 @@ use Symfony\Component\Console\Question\Question;
 class BitBucketRepoListCommand extends AbstractBitbucketCommand
 {
     /** int */
-    const BITBUCKET_DEFAULT_LIFETIME = 360;
+    const BITBUCKET_DEFAULT_LIFETIME = 86400; // 24 - hours
 
     /** string */
     const BITBUCKET_CACHE_DIRECTORY = __DIR__ . '/../../cache';
