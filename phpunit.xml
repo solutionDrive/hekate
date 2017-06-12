@@ -20,4 +20,14 @@
             <directory suffix="Test.php">tests/</directory>
         </testsuite>
     </testsuites>
+    <filter>
+        <whitelist processUncoveredFilesFromWhitelist="true">
+            <directory suffix=".php">src/</directory>
+            <file>*</file>
+            <exclude>
+                <directory suffix=".php">src/commands/</directory>
+                <file>*</file>
+            </exclude>
+        </whitelist>
+    </filter>
 </phpunit>

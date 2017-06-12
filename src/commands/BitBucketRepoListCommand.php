@@ -10,14 +10,10 @@
 
 namespace sd\hekate\commands;
 
-use Bitbucket\API\Http\Response\Pager;
 use Bitbucket\API\Repositories;
-use Buzz\Message\Response;
-use sd\hekate\config\BitBucketConfiguration;
 use sd\hekate\lib\BitbucketRepositoryList;
 use sd\hekate\lib\HekateCache;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Helper\Table;
@@ -29,7 +25,10 @@ use Symfony\Component\Console\Question\Question;
 
 class BitBucketRepoListCommand extends AbstractHekateCommand
 {
+    /** int */
     const BITBUCKET_DEFAULT_LIFETIME = 360;
+
+    /** string */
     const BITBUCKET_CACHE_DIRECTORY = __DIR__ . '/../../cache';
 
     /** @var  string */
@@ -42,7 +41,7 @@ class BitBucketRepoListCommand extends AbstractHekateCommand
     protected $forceQuestions;
 
     /**
-     * Basic Setup
+     * Configure the commad
      */
     protected function configure()
     {
@@ -189,7 +188,7 @@ class BitBucketRepoListCommand extends AbstractHekateCommand
      */
     protected function _needToAskForAccount(): bool
     {
-        return $this->forceQuestions || (is_null($this->account) && $this->_accountIsNotInConfig());
+        return $this->forceQuestions || (null === $this->account && $this->_accountIsNotInConfig());
     }
 
     /**
