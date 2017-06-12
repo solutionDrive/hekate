@@ -71,7 +71,7 @@ class BitBucketConfiguration
     }
 
     /**
-     * @todo evtl hier das pw mit dem public key des rechners verschlusseln
+     * @todo maybe encryption could go here
      * @param $password
      */
     public function setPassword($password)
