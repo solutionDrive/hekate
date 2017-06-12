@@ -11,6 +11,7 @@
 namespace sd\hekate\commands;
 
 use Bitbucket\API\Repositories;
+use sd\hekate\config\BitBucketConfiguration;
 use sd\hekate\lib\BitbucketRepositoryList;
 use sd\hekate\lib\HekateCache;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
@@ -54,6 +55,7 @@ class BitBucketRepoListCommand extends AbstractBitbucketCommand
             ->addOption('account', 'a', InputArgument::OPTIONAL, 'account from which private repositories will be fetched')
             ->addOption('projectkey', 'k', InputArgument::OPTIONAL, 'Filter the repositories by project key')
             ->addOption('ask-questions', 'aq', InputOption::VALUE_NONE, 'Give Credentials on commandline prompt')
+            ->addOption('config', 'c', InputOption::VALUE_OPTIONAL, 'Alternative config file for your bitbucket-settings', realpath(BitBucketConfiguration::BITBUCKET_CONFIG_FILE_LOCATION))
         ;
 
     }
@@ -65,7 +67,8 @@ class BitBucketRepoListCommand extends AbstractBitbucketCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->_initConfig();
+        $pathToConfig = $input->getOption('config');
+        $this->_initConfig($pathToConfig);
 
         $this->forceQuestions = (bool)$input->getOption('ask-questions');
 
